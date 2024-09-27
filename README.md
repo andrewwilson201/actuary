@@ -1,0 +1,2 @@
+# actuary
+functions for actuaries
