@@ -1,0 +1,17 @@
+Package: actuary
+Title: Useful functions for actuaries
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Andrew",
+           family = "Wilson",
+           role = c("aut", "cre"),
+           email = "andrewm.wilson@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Useful functions to make life easier for actuaries.
+Imports: dplyr, tidyr, pracma
+License: What license it uses
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    testthat
+RoxygenNote: 7.3.2
