@@ -30,7 +30,7 @@
 #'
 #' @export
 
-fit_distributions1 <- function(data, risk_shift = 0, distributions = c("lnorm", "pareto", "weibull", "gamma", "invgauss")) {
+fit_distributions <- function(data, risk_shift = 0, distributions = c("lnorm", "pareto", "weibull", "gamma", "invgauss")) {
 
 
   # warn if there are zero or negative values in vector provided
