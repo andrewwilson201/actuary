@@ -266,7 +266,7 @@ fit_distributions <- function(data, risk_shift = 0, distributions = c("lnorm", "
 
   # create summary statistics plot
 
-  summary_plot <- summary_table %>%
+  summary_plot <- summary_table |>
     tidyr::pivot_longer(cols = -metric, names_to = "distribution", values_to = "value") |>
     dplyr::mutate(value = as.numeric(gsub(",", "", value))) |>
     dplyr::mutate(metric = forcats::fct_relevel(metric, "mean", "sd", "min", "max")) |>
