@@ -42,7 +42,8 @@ custom_invgauss <- list(
   },
   r = function(n, mean, shape) {
     actuar::rinvgauss(n, mean = mean, shape = shape)
-  }
+  },
+  name = "invgauss"
 )
 
 #' Pareto density function wrapper for fitdistrplus
@@ -65,5 +66,6 @@ custom_pareto <- list(
   },
   r = function(n, shape, scale) {
     actuar::rpareto(n, shape = shape, scale = scale)
-  }
+  },
+  name = "pareto"
 )
