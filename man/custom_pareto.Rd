@@ -5,7 +5,7 @@
 \alias{custom_pareto}
 \title{Pareto density function wrapper for fitdistrplus}
 \format{
-An object of class \code{list} of length 4.
+An object of class \code{list} of length 5.
 }
 \usage{
 custom_pareto
