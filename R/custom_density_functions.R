@@ -5,6 +5,7 @@
 #' @param scale Scale parameter.
 #' @param log Logical; if TRUE, probabilities p are given as log(p).
 #' @return Density evaluated at x.
+#' @export
 dpareto_custom <- function(x, shape, scale, log = FALSE) {
   actuar::dpareto(x, shape = shape, scale = scale, log = log)
 }
@@ -16,6 +17,7 @@ dpareto_custom <- function(x, shape, scale, log = FALSE) {
 #' @param shape Shape parameter.
 #' @param log Logical; if TRUE, probabilities p are given as log(p).
 #' @return Density evaluated at x.
+#' @export
 dinvgauss_custom <- function(x, mean, shape, log = FALSE) {
   actuar::dinvgauss(x, mean = mean, shape = shape, log = log)
 }
