@@ -58,7 +58,7 @@ fit_distributions <- function(data, risk_shift = 0, distributions = c("lnorm", "
     tryCatch({
       if (dist == "pareto") {
         # for pareto supply starting values
-        fit <- fitdistrplus::fitdist(shifted_data, distr = dpareto_custom, start = list(shape = 1, scale = min(shifted_data)))
+        fit <- fitdistrplus::fitdist(shifted_data, distr = custom_pareto, start = list(shape = 1, scale = min(shifted_data)))
       } else if (dist == "gamma") {
         # for gamma manually parameterise the distribution to use shape and scale rather than the defaults of shape and rate (fits more easily this way)
         # also normalise before fitting and supply sensible starting values
@@ -82,7 +82,7 @@ fit_distributions <- function(data, risk_shift = 0, distributions = c("lnorm", "
 
       } else if (dist == "invgauss") {
 
-        fit <- fitdistrplus::fitdist(shifted_data, distr = dinvgauss_custom, start = list(mean = mean(shifted_data), shape = 1))
+        fit <- fitdistrplus::fitdist(shifted_data, distr = custom_invgauss, start = list(mean = mean(shifted_data), shape = 1))
 
       } else {
         # for lognormal and weibull just fit
@@ -141,10 +141,10 @@ fit_distributions <- function(data, risk_shift = 0, distributions = c("lnorm", "
 
   distribution_functions <- list(
     lnorm = function(x, params) plnorm(x - risk_shift, meanlog = params["meanlog"], sdlog = params["sdlog"]),
-    pareto = function(x, params) ppareto(x - risk_shift, shape = params["shape"], scale = params["scale"]),
+    pareto = function(x, params) actuar::ppareto(x - risk_shift, shape = params["shape"], scale = params["scale"]),
     weibull = function(x, params) pweibull(x - risk_shift, shape = params["shape"], scale = params["scale"]),
     gamma = function(x, params) pgamma2(x - risk_shift, shape = params["shape"], scale = params["scale"]),
-    invgauss = function(x, params) pinvgauss(x - risk_shift, mean = params["mean"], shape = params["shape"])
+    invgauss = function(x, params) actuar::pinvgauss(x - risk_shift, mean = params["mean"], shape = params["shape"])
   )
 
   cdf_data <- lapply(names(fits), function(dist) {
