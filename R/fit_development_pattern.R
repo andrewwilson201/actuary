@@ -30,6 +30,7 @@
 #' @return a list with the fitted pattern, the original input data, a triangle of individual ratios, the r_squared for the curve fits, a monthly pattern, the development units and the projected ultimates. monthly pattern is fitted using a piecewise cubic Hermite interpolating polynomial and if using BF or CC is calculated using the BF / CC ultimates.
 #' 
 #' @examples 
+#' \dontrun{
 #' # fit chain ladder to example triangle data
 #' fit_development_pattern(uw_year, dev_year, claim_number, triangle_data)
 #' 
@@ -56,7 +57,7 @@
 #'                                claim_number, 
 #'                                triangle_data, 
 #'                                exclude_points = list(c(13, 1), c(7, 2)))
-#'                       
+#' }
 #' @references Mack, T (1993). Distribution-free calculation of the standard error of chain ladder reserve estimates. https://www.actuaries.org/LIBRARY/ASTIN/vol23no2/213.pdf
 #' 
 #' @export
@@ -82,10 +83,10 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
   # and columns needs to be as specified in the documentation
   if(!is.null(bf_prior) | !is.null(cc_decay_factor)) {
     if(is.null(premium)) stop("need to supply an premium if BF or CC method is used.")
-    cohort_var_string <- rlang::as_name(enquo(cohort_var))
+    cohort_var_string <- rlang::as_name(rlang::enquo(cohort_var))
     if(!(cohort_var_string %in% colnames(premium))) stop("premium needs to contain the same cohort name as in the triangle data provided")
-    data_cohort_values <- data %>% dplyr::pull(!!enquo(cohort_var)) %>% unique()
-    exposure_base_cohort_values <- premium %>% dplyr::pull(!!enquo(cohort_var)) %>% unique()
+    data_cohort_values <- data %>% dplyr::pull(!!rlang::enquo(cohort_var)) %>% unique()
+    exposure_base_cohort_values <- premium %>% dplyr::pull(!!rlang::enquo(cohort_var)) %>% unique()
     
     missing_cohorts <- setdiff(data_cohort_values, exposure_base_cohort_values)
     
@@ -143,11 +144,11 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
   
   # check that data provided is a triangle and so each cohort doesn't cut off at the same development period
   
-  max_devs <- daily_prem_dev |> 
+  max_devs <- data |> 
     dplyr::group_by({{ cohort_var }}) |> 
     dplyr::summarise(max_dev = max({{ dev_var }})) |> 
     dplyr::group_by(max_dev) |> 
-    dplyr::summarise(count = n()) |> 
+    dplyr::summarise(count = dplyr::n()) |> 
     dplyr::arrange(desc(count))
   
   if(nrow(dplyr::filter(max_devs, count > 1)) > 0) warning(paste0("check triangle data provided is indeed a triangle. ", max_devs |> dplyr::slice_head(n = 1) |> dplyr::pull(count), " of the cohorts have a maximum development period of ", max_devs |> dplyr::slice_head(n = 1) |> dplyr::pull(max_dev)))
@@ -164,7 +165,7 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
   
   # ungroup data
   
-  data <- ungroup(data)
+  data <- dplyr::ungroup(data)
   
   # fill in missing data items
   
@@ -280,12 +281,12 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     # if exclude_high_low then adjust denominator / numerator include flags
     dplyr::group_by({{ cohort_var }}) |> 
     dplyr::arrange({{ dev_var }}, .by_group = TRUE) |> 
-    dplyr::mutate(denominator_include = case_when(
+    dplyr::mutate(denominator_include = dplyr::case_when(
       exclude_high == TRUE & high_flag == 1 ~ 0,
       exclude_low == TRUE & low_flag == 1 ~ 0,
       TRUE ~ denominator_include
     )) |> 
-    dplyr::mutate(numerator_include = case_when(
+    dplyr::mutate(numerator_include = dplyr::case_when(
       exclude_high == TRUE & dplyr::lag(high_flag, default = 0) == 1 ~ 0,
       exclude_low == TRUE & dplyr::lag(low_flag, default = 0) == 1 ~ 0,
       TRUE ~ numerator_include
@@ -296,7 +297,7 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     # if preceding row is zero or missing then set numerator include to zero
     dplyr::group_by({{ cohort_var }}) |> 
     dplyr::arrange({{ dev_var }}, .by_group = TRUE) |> 
-    dplyr::mutate(numerator_include = dplyr::if_else(lag({{ weighting_var }}, default = 0) == 0, 0, numerator_include),
+    dplyr::mutate(numerator_include = dplyr::if_else(dplyr::lag({{ weighting_var }}, default = 0) == 0, 0, numerator_include),
                   denominator_include = dplyr::if_else({{ weighting_var }} == 0, 0, denominator_include)) |> 
     # adjust flag to allow for num_periods
     dplyr::group_by({{ dev_var }}) |> 
@@ -326,8 +327,8 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     # expand for number of future dev periods
     dplyr::mutate(original_data_flag = 1) %>% 
     dplyr::bind_rows(
-      dplyr::tibble(!!enquo(dev_var) := {
-        max_val <- max(dplyr::pull(., !!enquo(dev_var)))
+      dplyr::tibble(!!rlang::enquo(dev_var) := {
+        max_val <- max(dplyr::pull(., !!rlang::enquo(dev_var)))
         seq(
           from = max_val + dev_period_length,
           by = dev_period_length,
@@ -350,7 +351,7 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     dplyr::mutate(dev_period = dplyr::row_number()) |> 
     dplyr::mutate(ata_fit = dplyr::if_else(ata <= 1, NA_real_, ata),
                   y_t = log(log(ata_fit / (ata_fit - 1))),
-                  x_t = if_else(ata <= 1, NA_real_, log(dev_period)),
+                  x_t = dplyr::if_else(ata <= 1, NA_real_, log(dev_period)),
                   ata_count = dplyr::if_else(is.na(ata_fit), 0, 1)) |> 
     dplyr::summarise(x = sum(x_t, na.rm = TRUE),
                      y = sum(y_t, na.rm = TRUE),
@@ -373,7 +374,7 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     dplyr::mutate(dev_period = dplyr::row_number()) |> 
     dplyr::mutate(ata_fit = dplyr::if_else(ata <= 1, NA_real_, ata),
                   y_t = log(ata_fit - 1),
-                  x_t = if_else(ata <= 1, NA_real_, (dev_period)),
+                  x_t = dplyr::if_else(ata <= 1, NA_real_, (dev_period)),
                   ata_count = dplyr::if_else(is.na(ata_fit), 0, 1)) |> 
     dplyr::summarise(x = sum(x_t, na.rm = TRUE),
                      y = sum(y_t, na.rm = TRUE),
@@ -398,11 +399,11 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     dplyr::mutate(dev_period = dplyr::row_number()) |> 
     dplyr::mutate(ata_fit = dplyr::if_else(ata <= 1, NA_real_, ata),
                   y_t = log(ata_fit - 1),
-                  x_t_1 = if_else(ata <= 1, NA_real_, log(dev_period - 0.5)),
-                  x_t_2 = if_else(ata <= 1, NA_real_, log(dev_period + 0)),
-                  x_t_3 = if_else(ata <= 1, NA_real_, log(dev_period + 1)),
-                  x_t_4 = if_else(ata <= 1, NA_real_, log(dev_period + 3)),
-                  x_t_5 = if_else(ata <= 1, NA_real_, log(dev_period + 5)),
+                  x_t_1 = dplyr::if_else(ata <= 1, NA_real_, log(dev_period - 0.5)),
+                  x_t_2 = dplyr::if_else(ata <= 1, NA_real_, log(dev_period + 0)),
+                  x_t_3 = dplyr::if_else(ata <= 1, NA_real_, log(dev_period + 1)),
+                  x_t_4 = dplyr::if_else(ata <= 1, NA_real_, log(dev_period + 3)),
+                  x_t_5 = dplyr::if_else(ata <= 1, NA_real_, log(dev_period + 5)),
                   ata_count = dplyr::if_else(is.na(ata_fit), 0, 1)) |> 
     dplyr::summarise(x_1 = sum(x_t_1, na.rm = TRUE),
                      x_2 = sum(x_t_2, na.rm = TRUE),
@@ -497,10 +498,10 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
                   selected_ata = dplyr::if_else(dev_period >= dplyr::coalesce(smooth_from, 999),
                                                 selected_curve_ata, ata)) |> 
     # if curve(s) have failed to fit then set selected ata to CL ATA
-    dplyr::mutate(selected_ata = if_else(is.nan(selected_ata), ata, selected_ata)) |> 
-    dplyr::mutate(selected_ata = if_else(is.na(selected_ata), ata, selected_ata)) |> 
+    dplyr::mutate(selected_ata = dplyr::if_else(is.nan(selected_ata), ata, selected_ata)) |> 
+    dplyr::mutate(selected_ata = dplyr::if_else(is.na(selected_ata), ata, selected_ata)) |> 
     # if a tail factor has been provided use this at the last development period
-    dplyr::mutate(selected_ata = if_else(tail_factor != 1 & row_number() == n(), ata, selected_ata)) |> 
+    dplyr::mutate(selected_ata = dplyr::if_else(tail_factor != 1 & dplyr::row_number() == dplyr::n(), ata, selected_ata)) |> 
     dplyr::mutate(atu = rev(cumprod(rev(selected_ata))),
                   pct_dev = 1 / atu) |> 
     dplyr::select(dev_period, ata, weibull_ata, exponential_ata, inv_power_ata, selected_ata, atu, pct_dev, original_data_flag, ata_ratio) 
@@ -519,7 +520,7 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     
     ultimates <- ultimates |> 
       dplyr::ungroup() |> 
-      dplyr::left_join(premium, join_by({{ cohort_var }})) |> 
+      dplyr::left_join(premium, dplyr::join_by({{ cohort_var }})) |> 
       dplyr::mutate(ultimate = {{ weighting_var }} + (1 - pct_dev) * premium * bf_prior)
     
     
@@ -527,8 +528,8 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     
     ultimates <- ultimates |> 
       dplyr::ungroup() |> 
-      dplyr::mutate(row_num = row_number()) |> 
-      dplyr::left_join(premium, join_by({{ cohort_var }})) 
+      dplyr::mutate(row_num = dplyr::row_number()) |> 
+      dplyr::left_join(premium, dplyr::join_by({{ cohort_var }})) 
     
     years <- unique(dplyr::pull(ultimates, row_num))
     
@@ -615,7 +616,7 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
           ~ {
             i <- .
             # factors from current row to the last row
-            dev_factors <- selected_ata[i:(n() - 1)]
+            dev_factors <- selected_ata[i:(dplyr::n() - 1)]
             dev_factors <- c(1, dev_factors)
             # products of those factors
             partial_products <- purrr::accumulate(dev_factors, `*`)
