@@ -148,7 +148,7 @@ fit_distributions <- function(data, risk_shift = 0, distributions = c("lnorm", "
 
   cdf_data <- lapply(names(fits), function(dist) {
     params <- fits[[dist]]$estimate
-    tibble(
+    dplyr::tibble(
       x = x_range,
       y = distribution_functions[[dist]](x_range, params),
       distribution = dist
