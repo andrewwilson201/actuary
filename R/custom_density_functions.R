@@ -32,7 +32,7 @@ dinvgauss <- function(x, mean, shape, log = FALSE) {
 #' @export
 custom_invgauss <- list(
   d = function(x, mean, shape, log = FALSE) {
-    dinvgauss(x, mean = mean, shape = shape, log = log)
+    actuar::dinvgauss(x, mean = mean, shape = shape, log = log)
   },
   p = function(x, mean, shape) {
     actuar::pinvgauss(x, mean = mean, shape = shape)
@@ -56,7 +56,7 @@ custom_invgauss <- list(
 #' @export
 custom_pareto <- list(
   d = function(x, shape, scale, log = FALSE) {
-    dpareto(x, shape = shape, scale = scale, log = log)
+    actuar::dpareto(x, shape = shape, scale = scale, log = log)
   },
   p = function(x, shape, scale) {
     actuar::ppareto(x, shape = shape, scale = scale)

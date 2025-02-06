@@ -54,11 +54,14 @@ fit_distributions <- function(data, risk_shift = 0, distributions = c("lnorm", "
 
   fits <- list()
 
+  pareto <- custom_pareto
+  invgauss <- custom_invgauss
+
   for (dist in distributions) {
     tryCatch({
       if (dist == "pareto") {
         # for pareto supply starting values
-        fit <- fitdistrplus::fitdist(shifted_data, distr = custom_pareto, start = list(shape = 1, scale = min(shifted_data)))
+        fit <- fitdistrplus::fitdist(shifted_data, distr = pareto, start = list(shape = 1, scale = min(shifted_data)))
       } else if (dist == "gamma") {
         # for gamma manually parameterise the distribution to use shape and scale rather than the defaults of shape and rate (fits more easily this way)
         # also normalise before fitting and supply sensible starting values
