@@ -27,7 +27,7 @@ fit_distributions(
    \item{a table with percentiles for all distributions}
    \item{a summary statistics table based on simulating 100k values from the fitted distributions}
    \item{a plot of the summary statistics}
-   
+
 }
 }
 \description{

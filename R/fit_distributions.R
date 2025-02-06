@@ -32,6 +32,8 @@
 
 fit_distributions <- function(data, risk_shift = 0, distributions = c("lnorm", "pareto", "weibull", "gamma", "invgauss")) {
 
+  require(actuar)
+
   # warn if there are zero or negative values in vector provided
   if(any(data == 0)) warning("the data provided contains zero values. this may result in unreliable fits. check your input data.")
   if(any(data < 0)) warning("the data provided contains negative values. this may result in unreliable fits. check you input data.")
