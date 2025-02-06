@@ -30,9 +30,8 @@
 #'
 #' @export
 
-fit_distributions <- function(data, risk_shift = 0, distributions = c("lnorm", "pareto", "weibull", "gamma", "invgauss")) {
+fit_distributions1 <- function(data, risk_shift = 0, distributions = c("lnorm", "pareto", "weibull", "gamma", "invgauss")) {
 
-  require(actuar)
 
   # warn if there are zero or negative values in vector provided
   if(any(data == 0)) warning("the data provided contains zero values. this may result in unreliable fits. check your input data.")
@@ -59,7 +58,7 @@ fit_distributions <- function(data, risk_shift = 0, distributions = c("lnorm", "
     tryCatch({
       if (dist == "pareto") {
         # for pareto supply starting values
-        fit <- fitdistrplus::fitdist(shifted_data, "pareto", start = list(shape = 1, scale = min(shifted_data)))
+        fit <- fitdistrplus::fitdist(shifted_data, distr = dpareto_custom, start = list(shape = 1, scale = min(shifted_data)))
       } else if (dist == "gamma") {
         # for gamma manually parameterise the distribution to use shape and scale rather than the defaults of shape and rate (fits more easily this way)
         # also normalise before fitting and supply sensible starting values
@@ -83,7 +82,7 @@ fit_distributions <- function(data, risk_shift = 0, distributions = c("lnorm", "
 
       } else if (dist == "invgauss") {
 
-        fit <- fitdistrplus::fitdist(shifted_data, "invgauss", start = list(mean = mean(shifted_data), shape = 1))
+        fit <- fitdistrplus::fitdist(shifted_data, distr = dinvgauss_custom, start = list(mean = mean(shifted_data), shape = 1))
 
       } else {
         # for lognormal and weibull just fit
