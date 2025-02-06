@@ -3,8 +3,6 @@
 export(create_simulations)
 export(custom_invgauss)
 export(custom_pareto)
-export(dinvgauss)
-export(dpareto)
 export(fit_development_pattern)
 export(fit_development_pattern_ml)
 export(fit_distributions)
