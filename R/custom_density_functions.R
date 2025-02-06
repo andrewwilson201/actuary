@@ -6,7 +6,7 @@
 #' @param log Logical; if TRUE, probabilities p are given as log(p).
 #' @return Density evaluated at x.
 #' @export
-dpareto_custom <- function(x, shape, scale, log = FALSE) {
+dpareto <- function(x, shape, scale, log = FALSE) {
   actuar::dpareto(x, shape = shape, scale = scale, log = log)
 }
 
@@ -18,7 +18,7 @@ dpareto_custom <- function(x, shape, scale, log = FALSE) {
 #' @param log Logical; if TRUE, probabilities p are given as log(p).
 #' @return Density evaluated at x.
 #' @export
-dinvgauss_custom <- function(x, mean, shape, log = FALSE) {
+dinvgauss <- function(x, mean, shape, log = FALSE) {
   actuar::dinvgauss(x, mean = mean, shape = shape, log = log)
 }
 
@@ -32,7 +32,7 @@ dinvgauss_custom <- function(x, mean, shape, log = FALSE) {
 #' @export
 custom_invgauss <- list(
   d = function(x, mean, shape, log = FALSE) {
-    actuar::dinvgauss(x, mean = mean, shape = shape, log = log)
+    dinvgauss(x, mean = mean, shape = shape, log = log)
   },
   p = function(x, mean, shape) {
     actuar::pinvgauss(x, mean = mean, shape = shape)
@@ -56,7 +56,7 @@ custom_invgauss <- list(
 #' @export
 custom_pareto <- list(
   d = function(x, shape, scale, log = FALSE) {
-    actuar::dpareto(x, shape = shape, scale = scale, log = log)
+    dpareto(x, shape = shape, scale = scale, log = log)
   },
   p = function(x, shape, scale) {
     actuar::ppareto(x, shape = shape, scale = scale)
