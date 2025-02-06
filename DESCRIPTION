@@ -1,11 +1,33 @@
-Package: actuary
 Type: Package
+Package: actuary
 Title: What the Package Does (Title Case)
 Version: 0.1.0
 Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Description: More about what it does (maybe more than one line) Use four
+    spaces when indenting paragraphs within the Description.
+License: MIT
+Imports: 
+    dplyr,
+    pracma,
+    purrr,
+    rlang,
+    tidyr,
+    ggplot2,
+    forcats,
+    ggtext,
+    scales,
+    furrr,
+    future,
+    progress,
+    yardstick,
+    dtplyr,
+    MASS,
+    gamlss.dist,
+    actuar,
+    fitdistrplus
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.3.2
+Depends: 
+    R (>= 3.5)
