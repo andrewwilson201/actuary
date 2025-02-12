@@ -3,7 +3,7 @@
 #' tidy example triangle data. one row per development year and cohort. no development periods beyond the latest evaluation.
 #'
 #' @format
-#' A dataframe with 441 rows and 3 columns
+#' A dataframe with 55 rows and 3 columns
 #' \describe{
 #'       \item{uw_year}{underwriting year}
 #'       \item{dev_year}{development year}
@@ -17,7 +17,7 @@
 #'
 #' monte carlo simulations with 20k simulated years. based on a poisson frequency distribution and lognormal severity distribution
 #'
-#' @format 
+#' @format
 #' A data frame with 49,936 rows and 3 columns:
 #' \describe{
 #'   \item{year}{simulated year}

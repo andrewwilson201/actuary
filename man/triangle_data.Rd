@@ -5,7 +5,7 @@
 \alias{triangle_data}
 \title{example triangle data}
 \format{
-A dataframe with 441 rows and 3 columns
+A dataframe with 55 rows and 3 columns
 \describe{
       \item{uw_year}{underwriting year}
       \item{dev_year}{development year}

@@ -1,45 +1,53 @@
-# Load libraries
-library(dplyr)
 
-# Set seed for reproducibility
+library(tidyverse)
+
+# set seed for reproducibility
 set.seed(123)
 
-# Define underwriting years
-uw_years <- 2003:2023
+# define the number of accident and development periods
+n_acc <- 10
+n_dev <- 10
 
-# Define maximum development years
-max_dev_year <- 21
+# base parameters for accident-specific decay:
+# k_base is the decay parameter for the first accident year,
+# delta is the amount by which k increases for each subsequent accident year.
+k_base <- 0.5
+delta <- 0.1
 
-# Function to generate cumulative claims for a single underwriting year
-generate_claims <- function(uw_year, max_dev_year) {
-  # Starting number of claims for dev_year 1
-  base_claims <- sample(10:50, 1)
+# generate triangle data
+triangle_df <- tibble(
+  accident = 1:n_acc,
+  base_claim = runif(n_acc, min = 100, max = 500)
+) |>
+  # each accident year gets its own decay parameter.
+  mutate(accident_k = k_base + (accident - 1) * delta)
 
-  # Define a growth rate for development years (10% to 30%)
-  growth_rate <- runif(1, 0.1, 0.3)
+# generate a common first development factor (for period 1) between 4 and 5.
+first_growth <- runif(1, min = 4, max = 5)
 
-  # Generate claim numbers for each development year
-  claim_numbers <- cumsum(base_claims * (1 + growth_rate) ^ (1:max_dev_year))
+# create the triangle
+triangle_long <- triangle_df |>
+  # Cceate all accident-development combinations.
+  crossing(tibble(development = 1:n_dev)) |>
+  arrange(accident, development) |>
+  group_by(accident) |>
+  # for each accident year, compute:
+  # - the incremental development factor for each development period, and
+  # - the cumulative development factor (as the cumulative product).
+  mutate(dev_factor = 1 + (first_growth - 1) * exp(-accident_k * (development - 1)),
+         cum_factor = cumprod(dev_factor),
+         value = base_claim * cum_factor,
+         # only the first (n_dev - accident + 1) development periods are observed.
+         value = if_else(development > (n_dev - accident + 1), NA_real_, value)) |>
+  ungroup() |>
+  # filter out the bottom right
+  filter(!is.na(value))
 
-  # Create a dataframe for the underwriting year
-  data.frame(
-    uw_year = uw_year,
-    dev_year = 1:max_dev_year,
-    claim_number = round(claim_numbers)
-  )
-}
-
-# Generate the claim development triangle by applying the function to all underwriting years
-triangle <- bind_rows(lapply(uw_years, generate_claims, max_dev_year = max_dev_year))
-
-# Sort
-triangle <- triangle %>%
-  arrange(uw_year, dev_year)
-
-# Remove the bottom right of the triangle
-
-triangle_data <- triangle %>%
-  filter(uw_year + dev_year <= 2024)
+# rename columns and remove some
+triangle_data <- triangle_long |>
+  transmute(uw_year = accident,
+            dev_year = development,
+            claim_number = value)
 
 # output
 setwd("data-raw")
