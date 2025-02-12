@@ -27,17 +27,6 @@
 
 layer_loss <- function(year, loss, retention, limit, reinstatements = 999, type = "occurrence") {
 
-  # capture the column expressions from the caller
-  year_expr <- rlang::enquo(year)
-  loss_expr <- rlang::enquo(loss)
-
-  # immediately evaluate these expressions to create a local tibble.
-  # this tibble is now fully realized and detached from the outer pipeline.
-  df <- dplyr::tibble(
-    year = rlang::eval_tidy(year_expr),
-    loss = rlang::eval_tidy(loss_expr)
-  )
-
   # warn if used within a case_when
   if (any(grepl("case_when", deparse(sys.calls())))) {
     warning("layer_loss used inside a case_when() statement may return unexpected results")
@@ -48,7 +37,7 @@ layer_loss <- function(year, loss, retention, limit, reinstatements = 999, type 
 
   if (type == "occurrence") {
 
-    result <- df |>
+    dplyr::tibble(year = {{ year }}, loss = {{ loss }}) |>
       # use data.table calculations
       dtplyr::lazy_dt() |>
       # group by year and calculate
@@ -71,7 +60,7 @@ layer_loss <- function(year, loss, retention, limit, reinstatements = 999, type 
 
   } else {
 
-    result <- df |>
+    dplyr::tibble(year = {{ year }}, loss = {{ loss }}) |>
       # use data.table calculations
       dtplyr::lazy_dt() |>
       # group by year and calculate cumulative loss
@@ -91,7 +80,6 @@ layer_loss <- function(year, loss, retention, limit, reinstatements = 999, type 
       dplyr::pull(agg_layer_loss)
 
   }
-
-  result
-
 }
+
+.datatable.aware <- TRUE
