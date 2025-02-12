@@ -55,7 +55,7 @@ layer_loss <- function(year, loss, retention, limit, reinstatements = 999, type 
                                                        limit * (reinstatements + 1) - cumulative_loss_lag,
                                                        ul_layer_loss),
                     capped_layer_loss = pmax(capped_layer_loss, 0)) |>
-      dplyr::as_tibble() |>
+      dplyr::collect() |>
       # extract required variable
       dplyr::pull(capped_layer_loss)
 
@@ -77,7 +77,7 @@ layer_loss <- function(year, loss, retention, limit, reinstatements = 999, type 
       dplyr::ungroup() |>
       # calculate contribution to the aggregate loss at the individual loss level
       dplyr::mutate(agg_layer_loss = layer_loss - layer_loss_lag) |>
-      dplyr::as_tibble() |>
+      dplyr::collect() |>
       # extract required variable
       dplyr::pull(agg_layer_loss)
 
