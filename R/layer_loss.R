@@ -27,6 +27,11 @@
 
 layer_loss <- function(year, loss, retention, limit, reinstatements = 999, type = "occurrence") {
 
+<<<<<<< HEAD
+=======
+  .datatable.aware <<- TRUE
+
+>>>>>>> d0287f3fcdd5818b6bb577ea40f578385a0432fd
   # warn if used within a case_when
   if (any(grepl("case_when", deparse(sys.calls())))) {
     warning("layer_loss used inside a case_when() statement may return unexpected results")
@@ -82,4 +87,7 @@ layer_loss <- function(year, loss, retention, limit, reinstatements = 999, type 
   }
 }
 
+<<<<<<< HEAD
 .datatable.aware <- TRUE
+=======
+>>>>>>> d0287f3fcdd5818b6bb577ea40f578385a0432fd
