@@ -53,7 +53,7 @@
 #' # view results
 #' ml_result$results
 #'
-#' # plot fitted pattern. note that it doesn't like a good fit because we only supplied two smooth_from values in the params_data.
+#' # plot the best pattern according to the algorithm
 #' plot_development_pattern(ml_result$best_fit)
 #'
 #' # view the plot of reserve against the goodness of fit metric
