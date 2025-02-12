@@ -67,8 +67,6 @@ fit_development_pattern_ml(
    \item{add the first diagonal from the holdout sample to the training data and repeat steps 2 to 6.}
    \item{repeat until all diagonals from the holdout sample are exhausted and then calculate the average goodness of the goodness of fit metrics across all iterations.}
    \item{the total reserve implied by the pattern is calculated as the difference between the ultimate and the claim amount at the latest diagonal in the holdout data.}
-   
-   
 }
 }
 \details{
@@ -85,11 +83,11 @@ CDR is the AvE plus the change in the IBNR estimate. equivalent to the change in
 \dontrun{
 
 # set up parameters file
-cl_parameters <- tidyr::expand_grid(smooth_from = c(1, 2), 
-                                    exclude_last_diag = c(TRUE, FALSE), 
-                                    exclude_high = c(TRUE, FALSE), 
+cl_parameters <- tidyr::expand_grid(smooth_from = c(1, 2),
+                                    exclude_last_diag = c(TRUE, FALSE),
+                                    exclude_high = c(TRUE, FALSE),
                                     exclude_low = c(TRUE, FALSE),
-                                    selected_curve = c("weibull", "inverse_power", "exponential_decay"), 
+                                    selected_curve = c("weibull", "inverse_power", "exponential_decay"),
                                     num_periods = c(1:5),
                                     future_dev_periods = c(0, 25))
 

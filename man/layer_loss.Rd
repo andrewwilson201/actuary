@@ -36,10 +36,10 @@ create a column with occurrence or aggregate losses into a layer with specified 
 \dontrun{
 
 # calculate 10m x 10m layer with 1 reinstatement
-losses |> mutate(l1 = layer_loss(year, amount, 10e6, 10e6, 1))
+losses |> dplyr::mutate(l1 = layer_loss(year, amount, 10e6, 10e6, 1))
 
 # calculate 10m xs 10m agg layer with 0 reinstatements
-losses |> mutate(l1 = layer_loss(year, amount, 10e6, 10e6, 0, type = "aggregate"))
+losses |> dplyr::mutate(l1 = layer_loss(year, amount, 10e6, 10e6, 0, type = "aggregate"))
 
 }
 

@@ -10,8 +10,6 @@
 #'    \item{add the first diagonal from the holdout sample to the training data and repeat steps 2 to 6.}
 #'    \item{repeat until all diagonals from the holdout sample are exhausted and then calculate the average goodness of the goodness of fit metrics across all iterations.}
 #'    \item{the total reserve implied by the pattern is calculated as the difference between the ultimate and the claim amount at the latest diagonal in the holdout data.}
-#'
-#'
 #' }
 #'
 #' requires tidy data. one row per cell in the unprojected triangle. \cr
