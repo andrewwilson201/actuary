@@ -1,87 +1,87 @@
 #' get range of development patterns from fit_development_pattern_ml function
-#' 
+#'
 #' @param ml_results the list object returned by running the fit_development_pattern_ml
 #' @param num_fits the number of fits to include in the range. e.g. if set to 25 it will take the best 25 fitting patterns from the ml_results list object.
 #' @param metric which goodness of fit metric to use when selecting the best fits. ave_score, cdr_score, huber_loss, rmse, mae or neg_ave_score.
 #' @return a list with a plot showing the range of percentage developed at each development month and a tibble with the monthly pattern for each of the fits.
-#' 
-#' @examples 
+#'
+#' @examples
 #' \dontrun{
-#' 
+#'
 #' # set up parameters file
-#' cl_parameters <- tidyr::expand_grid(smooth_from = c(1, 2), 
-#'                                     exclude_last_diag = c(TRUE, FALSE), 
-#'                                     exclude_high = c(TRUE, FALSE), 
+#' cl_parameters <- tidyr::expand_grid(smooth_from = c(1, 2),
+#'                                     exclude_last_diag = c(TRUE, FALSE),
+#'                                     exclude_high = c(TRUE, FALSE),
 #'                                     exclude_low = c(TRUE, FALSE),
-#'                                     selected_curve = c("weibull", "inverse_power", "exponential_decay"), 
+#'                                     selected_curve = c("weibull", "inverse_power", "exponential_decay"),
 #'                                     num_periods = c(1:5),
 #'                                     future_dev_periods = c(0, 25))
-#' 
+#'
 #' # run function
 #' ml_result <- fit_development_pattern_ml(uw_year, dev_year, claim_number, triangle_data, 1, 12, cl_parameters)
-#' 
+#'
 #' # get range of top 25 best fitting patterns
 #' ml_pattern_range(ml_result, 25)
-#' 
+#'
 #' }
-#' 
+#'
 #' @export
 
 ml_pattern_range <- function(ml_results, num_fits = 25, metric = ave_score) {
-  
+
   # validations
-  
+
   allowed_vars <- c("ave_score", "cdr_score", "huber_loss", "rmse", "mae", "neg_ave_score")
-  
+
   if (!as.character(rlang::ensym(metric)) %in% allowed_vars) {
     stop(paste0("error: 'metric' should be one of ", paste(allowed_vars, collapse = ", "), "."))
   }
-  
+
   if (is.character(substitute(metric))) {
     stop("error: 'metric' should be provided without quotation marks.")
   }
-  
+
   if(num_fits > nrow(ml_results$results)) stop("num_fits must be less than or equal to the number of rows in the results dataframe")
-  
-  
+
+
   # arrange by metric
-  ml_sel <- ml_results[["results"]] |> 
+  ml_sel <- ml_results[["results"]] |>
     dplyr::mutate(neg_ave_score = -neg_ave_score) |> # as currently this metric has the best fit as the largest number
     dplyr::arrange({{ metric }})
-  
+
   # get exposure base
-  exp_base = ml_results[["exposure_base"]] 
-  
+  exp_base = ml_results[["exposure_base"]]
+
   # rename column in exposure base
   if(!is.null(exp_base)) {
-    
-    exp_base <- exp_base |> 
+
+    exp_base <- exp_base |>
       dplyr::rename(premium = exposure)
-    
+
   }
-  
+
   # check if method column exists in the results and insert if not
   if(!("method" %in% colnames(ml_sel))) {
-    
-    ml_sel <- ml_sel |> 
+
+    ml_sel <- ml_sel |>
       dplyr::mutate(method = "cl")
-    
+
   }
-  
+
   # get name of dataframe originally supplied to function
   data_name <- ml_results$ml_inputs$data_name
-  
+
   # get the data frame
   data <- get(data_name, envir = .GlobalEnv)
-  
-  
+
+
   # fit patterns
   pattern_list <- purrr::map(
     .x = 1:num_fits,
     ~ {
       # Extract the method type from ml_sel for the current iteration
       method <- ml_sel[[.x, "method"]]
-      
+
       # Fit the pattern based on the method type
       if (method == "cl") {
         fit <- actuary::fit_development_pattern(
@@ -136,32 +136,32 @@ ml_pattern_range <- function(ml_results, num_fits = 25, metric = ave_score) {
           cc_decay_factor = ml_sel[[.x, "decay_factors"]] # Add decay_factor argument for cc method
         )
       }
-      
+
       # Return the fitted pattern with the fit number
-      fit$monthly_pattern %>% dplyr::mutate(fit_number = .x)
+      fit$monthly_pattern |> dplyr::mutate(fit_number = .x)
     }
-  ) |> 
+  ) |>
     dplyr::bind_rows()
-  
+
   # add method back on to patterns list
-  
-  pattern_list <- pattern_list |> 
+
+  pattern_list <- pattern_list |>
     dplyr::left_join(
-      ml_sel |> 
-        dplyr::mutate(fit_number = dplyr::row_number()) |> 
+      ml_sel |>
+        dplyr::mutate(fit_number = dplyr::row_number()) |>
         dplyr::select(method, fit_number),
       dplyr::join_by(fit_number)
     )
-  
+
   # produce plot showing range of development
-  
-  summary_data <- pattern_list %>%
-    dplyr::group_by(dev_month) %>%
+
+  summary_data <- pattern_list |>
+    dplyr::group_by(dev_month) |>
     dplyr::summarise(
       min_pct_dev = min(pct_dev),
       max_pct_dev = max(pct_dev)
     )
-  
+
   plot <- ggplot2::ggplot(summary_data, ggplot2::aes(x = dev_month)) +
     ggplot2::geom_ribbon(ggplot2::aes(ymin = min_pct_dev, ymax = max_pct_dev), fill = "skyblue", alpha = 0.7) +
     ggplot2::scale_y_continuous(labels = scales::percent) +
@@ -169,10 +169,10 @@ ml_pattern_range <- function(ml_results, num_fits = 25, metric = ave_score) {
       x = "development month",
       y = "percentage developed"
     )
-  
+
   # add dev pattern for best fit to the plot
   # add title
-  
+
   plot <- plot +
     ggplot2::geom_line(
       data = ml_results$best_fit$monthly_pattern,
@@ -181,9 +181,9 @@ ml_pattern_range <- function(ml_results, num_fits = 25, metric = ave_score) {
     ) +
     ggplot2::labs(title = "<span style = 'color : skyblue;'>range of development patterns from ML fits</span>  \n<span style = 'color : red3;'>pattern with best score</span>") +
     ggplot2::theme(plot.title = ggtext::element_markdown())
-  
+
   return(list(plot = plot, patterns = pattern_list))
-  
+
 }
 
 
