@@ -1,0 +1,145 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# actuary
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/andrewwilson201/actuary/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andrewwilson201/actuary/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
+The `actuary` package provides actuarial modeling tools for Monte Carlo loss simulations, loss reserving, and reinsurance layer loss calculations. It enables users to generate stochastic loss datasets with customisable frequency and severity distributions, fit development patterns to claim triangles, and calculate reinsurance losses for occurrence and aggregate layers with user-defined retentions, limits, and reinstatements. For development pattern selection, the package includes a machine learning approach that evaluates multiple reserving models using holdout validation to identify the best-fitting pattern based on predictive accuracy.
+
+
+## Installation
+
+You can install the development version of actuary from [GitHub](https://github.com/andrewwilson201/actuary) with:
+
+``` r
+# install.packages("pak")
+pak::pak("andrewwilson201/actuary")
+```
+
+## Examples
+
+### Monte Carlo Loss Simulations
+Generate simulated loss datasets using custom frequency and severity distributions.
+
+```{r monte_carlo}
+library(actuary)
+
+# Simulate 100,000 years of loss data with Poisson frequency (mean = 5) and Lognormal severity (meanlog = 13, sdlog = 0.5)
+sim_data <- create_simulations(
+  num_sims = 100000, 
+  mean_freq = 5, 
+  sev_dist = "lognorm2", 
+  sev_param1 = 13, 
+  sev_param2 = 0.5
+)
+
+head(sim_data)
+
+```
+
+### Loss Reserving with Development Patterns
+Fit a development pattern to a cumulative claims triangle. 
+
+```{r loss_reserving}
+# Example dataset
+triangle_data <- actuary::triangle_data
+
+# Fit chain-ladder model with optional smoothing
+fit <- fit_development_pattern(
+  cohort_var = uw_year, 
+  dev_var = dev_year, 
+  weighting_var = claim_number, 
+  data = triangle_data, 
+  smooth_from = 4
+)
+
+# View fitted development pattern
+plot_development_pattern(fit)
+```
+
+### Machine Learning for Development Pattern Selection
+Automatically select the best-fitting development pattern based on holdout validation.
+
+```{r mlr}
+# Define multiple reserving model parameters for evaluation
+params <- expand.grid(
+  exclude_last_diag = c(TRUE, FALSE),
+  smooth_from = c(3, 4),
+  exclude_high = c(TRUE),
+  exclude_low = c(TRUE),
+  selected_curve = c("weibull", "exponential_decay"),
+  num_periods = c(3, 4),
+  future_dev_periods = c(0, 12)
+)
+
+# Run machine learning model selection
+ml_result <- fit_development_pattern_ml(
+  cohort_var = uw_year, 
+  dev_var = dev_year, 
+  weighting_var = claim_number, 
+  data = triangle_data, 
+  dev_period_length = 1, 
+  dev_period_units = 12, 
+  params_data = params
+)
+
+# View ranked results
+ml_result$results
+
+# Plot best-fitting development pattern
+plot_development_pattern(ml_result$best_fit)
+```
+
+
+### Reinsurance Layer Loss Calculations
+Calculate occurrence and aggregate reinsurance losses.
+
+```{r layer_losses}
+# Example loss dataset
+losses <- data.frame(
+  year = rep(1:5, each = 5),
+  amount = c(1e6, 3e6, 5e6, 7e6, 9e6, 2e6, 4e6, 6e6, 8e6, 10e6, 
+             1.5e6, 3.5e6, 5.5e6, 7.5e6, 9.5e6, 2.5e6, 4.5e6, 6.5e6, 8.5e6, 10.5e6,
+             3e6, 6e6, 9e6, 12e6, 15e6)
+)
+
+# Calculate 10M x 10M occurrence loss with one reinstatement
+losses$occurrence_layer <- layer_loss(
+  year = losses$year, 
+  loss = losses$amount, 
+  retention = 10e6, 
+  limit = 10e6, 
+  reinstatements = 1, 
+  type = "occurrence"
+)
+
+# Calculate 10M x 10M aggregate layer loss with no reinstatements
+losses$aggregate_layer <- layer_loss(
+  year = losses$year, 
+  loss = losses$amount, 
+  retention = 10e6, 
+  limit = 10e6, 
+  reinstatements = 0, 
+  type = "aggregate"
+)
+
+head(losses)
+
+```
+
+
