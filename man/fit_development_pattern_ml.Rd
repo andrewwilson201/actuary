@@ -17,7 +17,7 @@ fit_development_pattern_ml(
   decay_factors = NULL,
   exposure_base = NULL,
   eval_metric = "ave_score",
-  num_cores = parallel::detectCores() - 1
+  num_cores = 1
 )
 }
 \arguments{
@@ -45,7 +45,7 @@ fit_development_pattern_ml(
 
 \item{eval_metric}{which goodness of fit metric to order the results dataframe and to select the best parameters for the best_fit object.}
 
-\item{num_cores}{number of cores to use for parallel processing. defaults to the number available - 1.}
+\item{num_cores}{number of cores to use for parallel processing. defaults to 1.}
 }
 \value{
 \enumerate{
@@ -87,24 +87,31 @@ cl_parameters <- tidyr::expand_grid(smooth_from = c(1, 2),
                                     exclude_last_diag = c(TRUE, FALSE),
                                     exclude_high = c(TRUE, FALSE),
                                     exclude_low = c(TRUE, FALSE),
-                                    selected_curve = c("weibull", "inverse_power", "exponential_decay"),
+                                    selected_curve = c("weibull",
+                                                       "inverse_power",
+                                                       "exponential_decay"),
                                     num_periods = c(1:5),
                                     future_dev_periods = c(0, 25))
 
 # run function
-ml_result <- fit_development_pattern_ml(uw_year, dev_year, claim_number, triangle_data, 1, 12, cl_parameters)
+ml_result <- fit_development_pattern_ml(uw_year,
+                                        dev_year,
+                                        claim_number,
+                                        triangle_data, 1, 12,
+                                        cl_parameters)
 
 # view results
 ml_result$results
 
-# plot fitted pattern. note that it doesn't like a good fit because we only supplied two smooth_from values in the params_data.
+# plot the best pattern according to the algorithm
 plot_development_pattern(ml_result$best_fit)
 
 # view the plot of reserve against the goodness of fit metric
 ml_result$results_plot
 
 # amend the plot so that selected curve is used for the colour of the points
-ml_result$results_plot + ggplot2::geom_point(ggplot2::aes(colour = selected_curve))
+ml_result$results_plot +
+    ggplot2::geom_point(ggplot2::aes(colour = selected_curve))
 
 }
 

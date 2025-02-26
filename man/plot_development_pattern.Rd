@@ -27,12 +27,16 @@ provide the whole object returned by the fit_development_pattern not just the de
 \dontrun{
 
 # fit chain ladder to example triangle data
-fit <- fit_development_pattern(uw_year, dev_year, claim_number, triangle_data)
+fit <- fit_development_pattern(uw_year,
+                               dev_year,
+                               claim_number,
+                               triangle_data)
 
 # view the fitted pattern
 plot_development_pattern(fit)
 
-# view the fitted pattern and include the fitted monthly pattern in a separate graph (will need to use the arrow in top left of plots pane to scroll back to see it)
+# view the fitted pattern and include the fitted monthly pattern in a
+# separate graph
 plot_development_pattern(fit, include_monthly_fit = TRUE)
 
 # view the fitted pattern and include the Weibull curve fit

@@ -83,13 +83,12 @@ use the plot_development_pattern function to view fitted pattern.
 # fit chain ladder to example triangle data
 fit_development_pattern(uw_year, dev_year, claim_number, triangle_data)
 
-# exclude uw years prior to 2013, exclude last diagonal, use a weibull fit to smooth from dev period 4 onewards
-fit <- fit_development_pattern(uw_year, 
-                               dev_year, 
-                               claim_number, 
-                               triangle_data, 
-                               exclude_last_diag = TRUE, 
-                               cohort_start = 2013, 
+# exclude last diagonal, use a weibull fit to smooth from dev period 4
+fit <- fit_development_pattern(uw_year,
+                               dev_year,
+                               claim_number,
+                               triangle_data,
+                               exclude_last_diag = TRUE,
                                smooth_from = 4)
 
 # view the fitted pattern
@@ -98,14 +97,15 @@ plot_development_pattern(fit)
 # view the table of individual ratios
 fit$ratio_table
 
-# ratios from dev 1 to dev 2 in 2015 and dev 2 to dev 3 in 2009 look high. these are row 13, column 1 and row 7, column 2 in the ratio_table
+# ratios from dev 1 to dev 2 in uw year 1 looks high. this is row 1,
+#   column 1 in the ratio_table
 # note that column indexing starts from dev_1 onwards (not uw_year)
 # refit excluding these points
-fit <- fit_development_pattern(uw_year, 
-                               dev_year, 
-                               claim_number, 
-                               triangle_data, 
-                               exclude_points = list(c(13, 1), c(7, 2)))
+fit <- fit_development_pattern(uw_year,
+                               dev_year,
+                               claim_number,
+                               triangle_data,
+                               exclude_points = list(c(1, 1)))
 }
 }
 \references{

@@ -44,20 +44,42 @@ create monte carlo simulations for a given frequency and severity distribution
 \examples{
 \dontrun{
 
-# create 10k simulated years with poisson mean of 5 and lognormal parameters of 13 and 0.5
-create_simulations(num_sims = 10e5, mean_freq = 5, sev_dist = "lognorm2", sev_param1 = 13, sev_param2 = 0.5)
+# create 10k simulated years with poisson mean of 5 and
+# lognormal parameters of 13 and 0.5
+create_simulations(num_sims = 10e5,
+                   mean_freq = 5,
+                   sev_dist = "lognorm2",
+                   sev_param1 = 13,
+                   sev_param2 = 0.5)
 
-# create 10k simulated years with sames as above except for negative binomial distribution with mean 5 and variance 10
-create_simulations(num_sims = 10e5, mean_freq = 5, sev_dist = "lognorm2", sev_param1 = 13, sev_param2 = 0.5, var_freq = 10)
+# create 10k simulated years with sames as above except for
+# negative binomial distribution with mean 5 and variance 10
+create_simulations(num_sims = 10e5,
+                   mean_freq = 5,
+                   sev_dist = "lognorm2",
+                   sev_param1 = 13,
+                   sev_param2 = 0.5,
+                   var_freq = 10)
 
-# create 10k simulated years with two different distriubtions using pmap. use the label variable to differentiate them in the output
+# create 10k simulated years with two different distriubtions using pmap.
+# use the label variable to differentiate them in the output
 # note pmap doesn't work if an empirical severity distribution is being used
-params <- dplyr::tibble(num_sims = 10e5, mean_freq = c(5, 2), sev_dist = c("lognorm2", "lognorm2"), sev_param1 = c(13, 6), sev_param2 = c(0.5, 0.7), label = c("typeA", "typeB"))
+params <- dplyr::tibble(num_sims = 10e5,
+                        mean_freq = c(5, 2),
+                        sev_dist = c("lognorm2", "lognorm2"),
+                        sev_param1 = c(13, 6),
+                        sev_param2 = c(0.5, 0.7),
+                        label = c("typeA", "typeB"))
 purrr::pmap_dfr(params, create_simulations)
 
-# create 10k simulated years with poisson frequency and empirical severity distribution where the loss amounts are distributed evenly between 5m and 10m.
-# in practice you would usually provide a full CDF stored in a separate dataframe.
-create_simulations(num_sims = 10e5, mean_freq = 5, sev_dist = "empirical", empirical = dplyr::tibble(probability = c(0, 1), loss = c(5e6, 10e6)))
+# create 10k simulated years with poisson frequency and empirical severity
+# distribution where the loss amounts are distributed evenly between 5-10m.
+# in practice you would provide a full CDF stored in a separate dataframe.
+create_simulations(num_sims = 10e5,
+                   mean_freq = 5,
+                   sev_dist = "empirical",
+                   empirical = dplyr::tibble(probability = c(0, 1),
+                                             loss = c(5e6, 10e6)))
 
 }
 
