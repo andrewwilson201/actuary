@@ -36,8 +36,8 @@
 #' @param num_cores number of cores to use for parallel processing. defaults to 1.
 #'
 #' @examples
-#' \dontrun{
 #'
+#'\dontrun{
 #' # set up parameters file
 #' cl_parameters <- tidyr::expand_grid(smooth_from = c(1, 2),
 #'                                     exclude_last_diag = c(TRUE, FALSE),
@@ -68,9 +68,7 @@
 #' # amend the plot so that selected curve is used for the colour of the points
 #' ml_result$results_plot +
 #'     ggplot2::geom_point(ggplot2::aes(colour = selected_curve))
-#'
 #' }
-
 #'
 #' @return
 #'
