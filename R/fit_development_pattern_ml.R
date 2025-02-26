@@ -33,7 +33,7 @@
 #' @param decay_factors if provided the algorithm will additionally assess the goodness of fit using the generalised Cape Cod method to set the reserves. can provide a single value or a vector of possible priors.
 #' @param exposure_base must be provided if bf_priors or decay_factors is provided. a dataframe with a column called exposure (probably the premium) and another column which must have the same name as cohort_var.
 #' @param eval_metric which goodness of fit metric to order the results dataframe and to select the best parameters for the best_fit object.
-#' @param num_cores number of cores to use for parallel processing. defaults to the number available - 1.
+#' @param num_cores number of cores to use for parallel processing. defaults to 1.
 #'
 #' @examples
 #' \dontrun{
@@ -43,12 +43,18 @@
 #'                                     exclude_last_diag = c(TRUE, FALSE),
 #'                                     exclude_high = c(TRUE, FALSE),
 #'                                     exclude_low = c(TRUE, FALSE),
-#'                                     selected_curve = c("weibull", "inverse_power", "exponential_decay"),
+#'                                     selected_curve = c("weibull",
+#'                                                        "inverse_power",
+#'                                                        "exponential_decay"),
 #'                                     num_periods = c(1:5),
 #'                                     future_dev_periods = c(0, 25))
 #'
 #' # run function
-#' ml_result <- fit_development_pattern_ml(uw_year, dev_year, claim_number, triangle_data, 1, 12, cl_parameters)
+#' ml_result <- fit_development_pattern_ml(uw_year,
+#'                                         dev_year,
+#'                                         claim_number,
+#'                                         triangle_data, 1, 12,
+#'                                         cl_parameters)
 #'
 #' # view results
 #' ml_result$results
@@ -60,7 +66,8 @@
 #' ml_result$results_plot
 #'
 #' # amend the plot so that selected curve is used for the colour of the points
-#' ml_result$results_plot + ggplot2::geom_point(ggplot2::aes(colour = selected_curve))
+#' ml_result$results_plot +
+#'     ggplot2::geom_point(ggplot2::aes(colour = selected_curve))
 #'
 #' }
 
@@ -83,7 +90,7 @@
 
 fit_development_pattern_ml <- function(cohort_var, dev_var, weighting_var, data, dev_period_length, dev_period_units,
                                        params_data, holdout_size = 2, bf_priors = NULL, decay_factors = NULL,
-                                       exposure_base = NULL, eval_metric = "ave_score", num_cores = parallel::detectCores() - 1) {
+                                       exposure_base = NULL, eval_metric = "ave_score", num_cores = 1) {
 
   # quoted strings
   cohort_var_name <- rlang::enquo(cohort_var)
@@ -281,7 +288,7 @@ fit_development_pattern_ml <- function(cohort_var, dev_var, weighting_var, data,
         # get columns required
         cc_calc <- result |>
           dplyr::select(!!cohort_var_name, !!dev_var_name, !!weighting_var_name, pct_dev, holdout_flag) |>
-          dplyr::left_join(exposure_base, join_by(!!cohort_var_name))
+          dplyr::left_join(exposure_base, dplyr::join_by(!!cohort_var_name))
 
         # only need to calculate ultimates in holdout sample and diagonal prior to the holdout sample
 
@@ -336,7 +343,7 @@ fit_development_pattern_ml <- function(cohort_var, dev_var, weighting_var, data,
           dplyr::arrange(!!dev_var_name, .by_group = TRUE) |>
           dplyr::mutate(ultimate = !!weighting_var_name + (1 - pct_dev) * exposure * lr,
                         # for AvE need to calculate expected using cape cod LR at last diagaonal of training data
-                        incr_expected = (pct_dev - dplyr::lag(pct_dev, default = 0)) * exposure * first(lr),
+                        incr_expected = (pct_dev - dplyr::lag(pct_dev, default = 0)) * exposure * dplyr::first(lr),
                         incr_actual = !!weighting_var_name - dplyr::lag(!!weighting_var_name, default = 0),
                         cdr = ultimate - dplyr::lag(ultimate, default = 0),
                         ave = incr_actual - incr_expected,
