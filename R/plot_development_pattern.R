@@ -6,6 +6,7 @@
 #' @param show_legend defaults to FALSE. show the legend for the colour variable in the plot
 #' @param include_monthly_fit include a separate graph showing the fitted monthly pattern against the chain ladder pattern. defaults to FALSE.
 #' @param include_fitted_curve defaults to FALSE. show the Weibull curve fit on the graph
+#' @return ggplot2 plot showing the fitted development pattern. if include_monthly_fit set to TRUE then returns a list containing two plots.
 #'
 #' @examples
 #' \dontrun{
