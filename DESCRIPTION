@@ -1,7 +1,7 @@
 Type: Package
 Package: actuary
 Title: Actuarial Functions and Utilities
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person("Andrew", "Wilson", , "andrewm.wilson@gmail.com", role = c("aut", "cre", "cph"))
 Description: Provides actuarial modeling tools for Monte Carlo loss
@@ -16,9 +16,9 @@ Description: Provides actuarial modeling tools for Monte Carlo loss
     based on predictive accuracy, this is based on the algorithm described
     in Richman, R and Balona, C (2020)<https://www.ssrn.com/abstract=3697256>.
 License: MIT + file LICENSE
-BugReports: https://github.com/andrewwilson201/actuary
+BugReports: https://github.com/andrewwilson201/actuary/issues
 Depends: 
-    R (>= 3.5)
+    R (>= 4.1.0)
 Imports: 
     dplyr,
     dtplyr,
