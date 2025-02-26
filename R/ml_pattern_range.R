@@ -13,12 +13,18 @@
 #'                                     exclude_last_diag = c(TRUE, FALSE),
 #'                                     exclude_high = c(TRUE, FALSE),
 #'                                     exclude_low = c(TRUE, FALSE),
-#'                                     selected_curve = c("weibull", "inverse_power", "exponential_decay"),
+#'                                     selected_curve = c("weibull",
+#'                                                        "inverse_power",
+#'                                                        "exponential_decay"),
 #'                                     num_periods = c(1:5),
 #'                                     future_dev_periods = c(0, 25))
 #'
 #' # run function
-#' ml_result <- fit_development_pattern_ml(uw_year, dev_year, claim_number, triangle_data, 1, 12, cl_parameters)
+#' ml_result <- fit_development_pattern_ml(uw_year,
+#'                                         dev_year,
+#'                                         claim_number,
+#'                                         triangle_data, 1, 12,
+#'                                         cl_parameters)
 #'
 #' # get range of top 25 best fitting patterns
 #' ml_pattern_range(ml_result, 25)
