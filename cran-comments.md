@@ -2,4 +2,8 @@
 
 0 errors | 0 warnings | 1 note
 
-* This is a new release.
+## Resubmission
+
+Amended BugReports field in DESCRIPTION to <https://github.com/andrewwilson/actuary/issues>
+Amended dependency in DESCRIPTION to R (>= 4.1.0)
+    
