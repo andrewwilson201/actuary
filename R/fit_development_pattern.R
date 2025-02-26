@@ -34,7 +34,7 @@
 #' # fit chain ladder to example triangle data
 #' fit_development_pattern(uw_year, dev_year, claim_number, triangle_data)
 #'
-#' # exclude last diagonal, use a weibull fit to smooth from dev period 4 onewards
+#' # exclude last diagonal, use a weibull fit to smooth from dev period 4
 #' fit <- fit_development_pattern(uw_year,
 #'                                dev_year,
 #'                                claim_number,
@@ -48,7 +48,8 @@
 #' # view the table of individual ratios
 #' fit$ratio_table
 #'
-#' # ratios from dev 1 to dev 2 in uw year 1 looks high. this is row 1, column 1 in the ratio_table
+#' # ratios from dev 1 to dev 2 in uw year 1 looks high. this is row 1,
+#' #   column 1 in the ratio_table
 #' # note that column indexing starts from dev_1 onwards (not uw_year)
 #' # refit excluding these points
 #' fit <- fit_development_pattern(uw_year,
@@ -119,7 +120,7 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     dplyr::arrange({{ dev_var }}, .by_group = TRUE) |>
     dplyr::mutate(error = {{ dev_var }} - dplyr::lag({{ dev_var }})) |>
     dplyr::ungroup() |>
-    dplyr::summarise(sd_error = sd(error, na.rm = TRUE)) |>
+    dplyr::summarise(sd_error = stats::sd(error, na.rm = TRUE)) |>
     dplyr::mutate(sd_error = tidyr::replace_na(sd_error, 0))
 
   if (possible_errors2$sd_error != 0) warning("triangle data doesn't contain one row for each cohort and development period. missing rows have been filled in and can be identified with the imputed_row column.")
@@ -148,7 +149,7 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     dplyr::summarise(max_dev = max({{ dev_var }})) |>
     dplyr::group_by(max_dev) |>
     dplyr::summarise(count = dplyr::n()) |>
-    dplyr::arrange(desc(count))
+    dplyr::arrange(dplyr::desc(count))
 
   if(nrow(dplyr::filter(max_devs, count > 1)) > 0) warning(paste0("check triangle data provided is indeed a triangle. ", max_devs |> dplyr::slice_head(n = 1) |> dplyr::pull(count), " of the cohorts have a maximum development period of ", max_devs |> dplyr::slice_head(n = 1) |> dplyr::pull(max_dev)))
 
@@ -178,7 +179,7 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     tidyr::complete({{ dev_var }} := seq(min_dev, max({{ dev_var }}), by = dev_period_length)) |>
     tidyr::fill({{ weighting_var }}) |>
     tidyr::replace_na(list(imputed_row = 1)) |>
-    dplyr::mutate(across({{ weighting_var }}, \(x) tidyr::replace_na(x, 0))) |>
+    dplyr::mutate(dplyr::across({{ weighting_var }}, \(x) tidyr::replace_na(x, 0))) |>
     dplyr::ungroup()
 
 
@@ -300,7 +301,7 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
                   denominator_include = dplyr::if_else({{ weighting_var }} == 0, 0, denominator_include)) |>
     # adjust flag to allow for num_periods
     dplyr::group_by({{ dev_var }}) |>
-    dplyr::arrange(desc({{ cohort_var }}), .by_group = TRUE) |>
+    dplyr::arrange(dplyr::desc({{ cohort_var }}), .by_group = TRUE) |>
     dplyr::mutate(numerator_count = cumsum(numerator_include),
                   denominator_count = cumsum(denominator_include)) |>
     # if num_periods is NULL then set to a large number
