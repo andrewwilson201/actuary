@@ -80,8 +80,8 @@ CDR score is the weighted average of the CDR in each value of cohort_var where t
 CDR is the AvE plus the change in the IBNR estimate. equivalent to the change in projected ultimate claim value over the time period.
 }
 \examples{
-\dontrun{
 
+\dontrun{
 # set up parameters file
 cl_parameters <- tidyr::expand_grid(smooth_from = c(1, 2),
                                     exclude_last_diag = c(TRUE, FALSE),
@@ -112,7 +112,6 @@ ml_result$results_plot
 # amend the plot so that selected curve is used for the colour of the points
 ml_result$results_plot +
     ggplot2::geom_point(ggplot2::aes(colour = selected_curve))
-
 }
 
 }

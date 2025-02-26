@@ -20,6 +20,9 @@ plot_development_pattern(
 
 \item{include_fitted_curve}{defaults to FALSE. show the Weibull curve fit on the graph}
 }
+\value{
+ggplot2 plot showing the fitted development pattern. if include_monthly_fit set to TRUE then returns a list containing two plots.
+}
 \description{
 provide the whole object returned by the fit_development_pattern not just the development_data item
 }
