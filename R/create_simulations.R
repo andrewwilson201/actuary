@@ -17,20 +17,42 @@
 #' @examples
 #' \dontrun{
 #'
-#' # create 10k simulated years with poisson mean of 5 and lognormal parameters of 13 and 0.5
-#' create_simulations(num_sims = 10e5, mean_freq = 5, sev_dist = "lognorm2", sev_param1 = 13, sev_param2 = 0.5)
+#' # create 10k simulated years with poisson mean of 5 and
+#' # lognormal parameters of 13 and 0.5
+#' create_simulations(num_sims = 10e5,
+#'                    mean_freq = 5,
+#'                    sev_dist = "lognorm2",
+#'                    sev_param1 = 13,
+#'                    sev_param2 = 0.5)
 #'
-#' # create 10k simulated years with sames as above except for negative binomial distribution with mean 5 and variance 10
-#' create_simulations(num_sims = 10e5, mean_freq = 5, sev_dist = "lognorm2", sev_param1 = 13, sev_param2 = 0.5, var_freq = 10)
+#' # create 10k simulated years with sames as above except for
+#' # negative binomial distribution with mean 5 and variance 10
+#' create_simulations(num_sims = 10e5,
+#'                    mean_freq = 5,
+#'                    sev_dist = "lognorm2",
+#'                    sev_param1 = 13,
+#'                    sev_param2 = 0.5,
+#'                    var_freq = 10)
 #'
-#' # create 10k simulated years with two different distriubtions using pmap. use the label variable to differentiate them in the output
+#' # create 10k simulated years with two different distriubtions using pmap.
+#' # use the label variable to differentiate them in the output
 #' # note pmap doesn't work if an empirical severity distribution is being used
-#' params <- dplyr::tibble(num_sims = 10e5, mean_freq = c(5, 2), sev_dist = c("lognorm2", "lognorm2"), sev_param1 = c(13, 6), sev_param2 = c(0.5, 0.7), label = c("typeA", "typeB"))
+#' params <- dplyr::tibble(num_sims = 10e5,
+#'                         mean_freq = c(5, 2),
+#'                         sev_dist = c("lognorm2", "lognorm2"),
+#'                         sev_param1 = c(13, 6),
+#'                         sev_param2 = c(0.5, 0.7),
+#'                         label = c("typeA", "typeB"))
 #' purrr::pmap_dfr(params, create_simulations)
 #'
-#' # create 10k simulated years with poisson frequency and empirical severity distribution where the loss amounts are distributed evenly between 5m and 10m.
-#' # in practice you would usually provide a full CDF stored in a separate dataframe.
-#' create_simulations(num_sims = 10e5, mean_freq = 5, sev_dist = "empirical", empirical = dplyr::tibble(probability = c(0, 1), loss = c(5e6, 10e6)))
+#' # create 10k simulated years with poisson frequency and empirical severity
+#' # distribution where the loss amounts are distributed evenly between 5-10m.
+#' # in practice you would provide a full CDF stored in a separate dataframe.
+#' create_simulations(num_sims = 10e5,
+#'                    mean_freq = 5,
+#'                    sev_dist = "empirical",
+#'                    empirical = dplyr::tibble(probability = c(0, 1),
+#'                                              loss = c(5e6, 10e6)))
 #'
 #' }
 #'
@@ -52,7 +74,7 @@ create_simulations <- function(num_sims, mean_freq, sev_dist, sev_param1 = 1, se
 
     # if var not specified then simulate required number of poisson variables
     set.seed(1010)
-    losses <- dplyr::tibble(num = rpois(num_sims, mean_freq)) |>
+    losses <- dplyr::tibble(num = stats::rpois(num_sims, mean_freq)) |>
       # create year
       dplyr::mutate(year = 1:nrow(dplyr::pick(num))) |>
       # expand dataframe so we have one row for each loss
@@ -91,12 +113,12 @@ create_simulations <- function(num_sims, mean_freq, sev_dist, sev_param1 = 1, se
 
   # add simulated severities using severity pararmeters provided
   set.seed(4321)
-  random_number <- runif(nrow(losses), 0, 1)
-  if(sev_dist == "lognorm2") sev <- dplyr::tibble(loss = rlnorm(nrow(losses), sev_param1, sev_param2) + risk_shift)
-  if(sev_dist == "gamma") sev <- dplyr::tibble(loss = rgamma(nrow(losses), shape = sev_param1, scale = sev_param2) + risk_shift)
+  random_number <- stats::runif(nrow(losses), 0, 1)
+  if(sev_dist == "lognorm2") sev <- dplyr::tibble(loss = stats::rlnorm(nrow(losses), sev_param1, sev_param2) + risk_shift)
+  if(sev_dist == "gamma") sev <- dplyr::tibble(loss = stats::rgamma(nrow(losses), shape = sev_param1, scale = sev_param2) + risk_shift)
   if(sev_dist == "pareto2") sev <- dplyr::tibble(loss = gamlss.dist::rPARETO2o(nrow(losses), sev_param1, sev_param2) + risk_shift)
-  if(sev_dist == "empirical") sev <- dplyr::tibble(loss = approx(empirical[["probability"]], empirical[["loss"]], xout = random_number, ties = "ordered")$y + risk_shift)
-  if(sev_dist == "weibull") sev <- dplyr::tibble(loss = rweibull(nrow(losses), shape = sev_param1, scale = sev_param2) + risk_shift)
+  if(sev_dist == "empirical") sev <- dplyr::tibble(loss = stats::approx(empirical[["probability"]], empirical[["loss"]], xout = random_number, ties = "ordered")$y + risk_shift)
+  if(sev_dist == "weibull") sev <- dplyr::tibble(loss = stats::rweibull(nrow(losses), shape = sev_param1, scale = sev_param2) + risk_shift)
 
   losses <- losses |>
     dplyr::bind_cols(sev)
