@@ -10,6 +10,20 @@ This is a resubmission. In this version I have:
 * Replaced `\dontrun{}` with `\donttest{}` for examples that are long-running
   but executable. Unwrapped examples in `R/layer_loss.R` which run in under 5
   seconds using the bundled `losses` dataset
+* Reduced the parameter grid in `\donttest{}` examples for
+  `fit_development_pattern_ml()` and `ml_pattern_range()` to avoid example
+  timeouts, and set `num_cores = 1` to prevent background process spawning
+  during checks
+* Replaced `.GlobalEnv` lookup with storing data directly in the `ml_inputs`
+  list returned by `fit_development_pattern_ml()`
+* Replaced positional column access with named column access in
+  `ml_pattern_range()`
+* Replaced all `%>%` with the native pipe `|>` in `fit_development_pattern.R`,
+  removing the internal magrittr import workaround
+* Used `isTRUE(all.equal())` instead of `==` for floating point comparison in
+  `create_simulations()`
+* Replaced `dplyr::coalesce(cohort_start, 0)` with an explicit `NULL` guard in
+  `fit_development_pattern()` to avoid silently treating 0 as no cohort filter
 
 ## R CMD check results
 
