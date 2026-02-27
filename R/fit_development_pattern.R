@@ -30,7 +30,7 @@
 #' @return a list with the fitted pattern, the original input data, a triangle of individual ratios, the r_squared for the curve fits, a monthly pattern, the development units and the projected ultimates. monthly pattern is fitted using a piecewise cubic Hermite interpolating polynomial and if using BF or CC is calculated using the BF / CC ultimates.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # fit chain ladder to example triangle data
 #' fit_development_pattern(uw_year, dev_year, claim_number, triangle_data)
 #'
@@ -136,7 +136,7 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
       if (all_pairs == FALSE) stop("exclude_points contains elements that are not pairs of integers")
 
     } else {
-      print("exclude_points needs to be a list")
+      stop("exclude_points needs to be a list")
     }
 
 

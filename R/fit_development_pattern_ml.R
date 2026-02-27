@@ -37,7 +37,7 @@
 #'
 #' @examples
 #'
-#'\dontrun{
+#'\donttest{
 #' # set up parameters file
 #' cl_parameters <- tidyr::expand_grid(smooth_from = c(1, 2),
 #'                                     exclude_last_diag = c(TRUE, FALSE),

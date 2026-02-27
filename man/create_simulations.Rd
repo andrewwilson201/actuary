@@ -42,7 +42,7 @@ dataset of monte carlo simulations
 create monte carlo simulations for a given frequency and severity distribution
 }
 \examples{
-\dontrun{
+\donttest{
 
 # create 10k simulated years with poisson mean of 5 and
 # lognormal parameters of 13 and 0.5

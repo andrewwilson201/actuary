@@ -6,7 +6,7 @@
 #' @return a list with a plot showing the range of percentage developed at each development month and a tibble with the monthly pattern for each of the fits.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'
 #' # set up parameters file
 #' cl_parameters <- tidyr::expand_grid(smooth_from = c(1, 2),

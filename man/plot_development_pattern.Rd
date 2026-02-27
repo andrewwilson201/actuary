@@ -27,7 +27,7 @@ ggplot2 plot showing the fitted development pattern. if include_monthly_fit set 
 provide the whole object returned by the fit_development_pattern not just the development_data item
 }
 \examples{
-\dontrun{
+\donttest{
 
 # fit chain ladder to example triangle data
 fit <- fit_development_pattern(uw_year,

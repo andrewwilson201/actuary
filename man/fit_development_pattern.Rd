@@ -79,7 +79,7 @@ data provided must be cumulative. \cr
 use the plot_development_pattern function to view fitted pattern.
 }
 \examples{
-\dontrun{
+\donttest{
 # fit chain ladder to example triangle data
 fit_development_pattern(uw_year, dev_year, claim_number, triangle_data)
 

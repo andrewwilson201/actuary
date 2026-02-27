@@ -1,7 +1,7 @@
 Type: Package
 Package: actuary
 Title: Actuarial Functions and Utilities
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: 
     person("Andrew", "Wilson", , "andrewm.wilson@gmail.com", role = c("aut", "cre", "cph"))
 Description: Provides actuarial modeling tools for Monte Carlo loss

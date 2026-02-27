@@ -20,7 +20,7 @@ a list with a plot showing the range of percentage developed at each development
 get range of development patterns from fit_development_pattern_ml function
 }
 \examples{
-\dontrun{
+\donttest{
 
 # set up parameters file
 cl_parameters <- tidyr::expand_grid(smooth_from = c(1, 2),

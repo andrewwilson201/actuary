@@ -15,7 +15,7 @@
 #' @return dataset of monte carlo simulations
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'
 #' # create 10k simulated years with poisson mean of 5 and
 #' # lognormal parameters of 13 and 0.5
@@ -73,7 +73,6 @@ create_simulations <- function(num_sims, mean_freq, sev_dist, sev_param1 = 1, se
   if(var_freq == mean_freq) {
 
     # if var not specified then simulate required number of poisson variables
-    set.seed(1010)
     losses <- dplyr::tibble(num = stats::rpois(num_sims, mean_freq)) |>
       # create year
       dplyr::mutate(year = 1:nrow(dplyr::pick(num))) |>
@@ -99,7 +98,6 @@ create_simulations <- function(num_sims, mean_freq, sev_dist, sev_param1 = 1, se
       # if var is specified then simulate negative binomial instead
       negbin_theta <- mean_freq / ((var_freq / mean_freq) - 1)
 
-      set.seed(1234)
       losses <- dplyr::tibble(num = MASS::rnegbin(num_sims, mean_freq, negbin_theta)) |>
         dplyr::mutate(year = 1:nrow(dplyr::pick(num))) |>
         dplyr::mutate(year = purrr::map2(year, num, function(x, y) rep(x, y))) |>
@@ -112,7 +110,6 @@ create_simulations <- function(num_sims, mean_freq, sev_dist, sev_param1 = 1, se
 
 
   # add simulated severities using severity pararmeters provided
-  set.seed(4321)
   random_number <- stats::runif(nrow(losses), 0, 1)
   if(sev_dist == "lognorm2") sev <- dplyr::tibble(loss = stats::rlnorm(nrow(losses), sev_param1, sev_param2) + risk_shift)
   if(sev_dist == "gamma") sev <- dplyr::tibble(loss = stats::rgamma(nrow(losses), shape = sev_param1, scale = sev_param2) + risk_shift)

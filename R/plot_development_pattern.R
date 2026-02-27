@@ -9,7 +9,7 @@
 #' @return ggplot2 plot showing the fitted development pattern. if include_monthly_fit set to TRUE then returns a list containing two plots.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'
 #' # fit chain ladder to example triangle data
 #' fit <- fit_development_pattern(uw_year,
