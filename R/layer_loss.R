@@ -12,12 +12,15 @@
 #' @return losses into the layer
 #'
 #' @examples
+#' \donttest{
 #'
 #' # calculate 10m x 10m layer with 1 reinstatement
 #' losses |> dplyr::mutate(l1 = layer_loss(year, amount, 10e6, 10e6, 1))
 #'
 #' # calculate 10m xs 10m agg layer with 0 reinstatements
 #' losses |> dplyr::mutate(l1 = layer_loss(year, amount, 10e6, 10e6, 0, type = "aggregate"))
+#'
+#' }
 #'
 #' @export
 

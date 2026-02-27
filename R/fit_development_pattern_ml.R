@@ -38,23 +38,22 @@
 #' @examples
 #'
 #'\donttest{
-#' # set up parameters file
-#' cl_parameters <- tidyr::expand_grid(smooth_from = c(1, 2),
+#' # set up a small parameters file for illustration
+#' cl_parameters <- tidyr::expand_grid(smooth_from = 999,
 #'                                     exclude_last_diag = c(TRUE, FALSE),
-#'                                     exclude_high = c(TRUE, FALSE),
-#'                                     exclude_low = c(TRUE, FALSE),
-#'                                     selected_curve = c("weibull",
-#'                                                        "inverse_power",
-#'                                                        "exponential_decay"),
-#'                                     num_periods = c(1:5),
-#'                                     future_dev_periods = c(0, 25))
+#'                                     exclude_high = FALSE,
+#'                                     exclude_low = FALSE,
+#'                                     selected_curve = "weibull",
+#'                                     num_periods = c(3, 5),
+#'                                     future_dev_periods = 0)
 #'
-#' # run function
+#' # run function (num_cores = 1 for sequential processing)
 #' ml_result <- fit_development_pattern_ml(uw_year,
 #'                                         dev_year,
 #'                                         claim_number,
 #'                                         triangle_data, 1, 12,
-#'                                         cl_parameters)
+#'                                         cl_parameters,
+#'                                         num_cores = 1)
 #'
 #' # view results
 #' ml_result$results
