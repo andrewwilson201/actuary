@@ -73,11 +73,8 @@ ml_pattern_range <- function(ml_results, num_fits = 25, metric = ave_score) {
 
   }
 
-  # get name of dataframe originally supplied to function
-  data_name <- ml_results$ml_inputs$data_name
-
-  # get the data frame
-  data <- get(data_name, envir = .GlobalEnv)
+  # get the data frame stored in ml_inputs
+  data <- ml_results$ml_inputs$data
 
 
   # fit patterns
@@ -96,13 +93,13 @@ ml_pattern_range <- function(ml_results, num_fits = 25, metric = ave_score) {
           data = data,
           dev_period_length = ml_results$ml_inputs$dev_period_length,
           dev_period_units = ml_results$ml_inputs$dev_period_units,
-          exclude_last_diag = ml_sel[[.x, 1]],
-          smooth_from = ml_sel[[.x, 2]],
-          exclude_high = ml_sel[[.x, 3]],
-          exclude_low = ml_sel[[.x, 4]],
-          selected_curve = ml_sel[[.x, 5]],
-          num_periods = ml_sel[[.x, 6]],
-          future_dev_periods = ml_sel[[.x, 7]]
+          exclude_last_diag = ml_sel[[.x, "exclude_last_diag"]],
+          smooth_from = ml_sel[[.x, "smooth_from"]],
+          exclude_high = ml_sel[[.x, "exclude_high"]],
+          exclude_low = ml_sel[[.x, "exclude_low"]],
+          selected_curve = ml_sel[[.x, "selected_curve"]],
+          num_periods = ml_sel[[.x, "num_periods"]],
+          future_dev_periods = ml_sel[[.x, "future_dev_periods"]]
         )
       } else if (method == "bf") {
         fit <- actuary::fit_development_pattern(
@@ -112,13 +109,13 @@ ml_pattern_range <- function(ml_results, num_fits = 25, metric = ave_score) {
           data = data,
           dev_period_length = ml_results$ml_inputs$dev_period_length,
           dev_period_units = ml_results$ml_inputs$dev_period_units,
-          exclude_last_diag = ml_sel[[.x, 1]],
-          smooth_from = ml_sel[[.x, 2]],
-          exclude_high = ml_sel[[.x, 3]],
-          exclude_low = ml_sel[[.x, 4]],
-          selected_curve = ml_sel[[.x, 5]],
-          num_periods = ml_sel[[.x, 6]],
-          future_dev_periods = ml_sel[[.x, 7]],
+          exclude_last_diag = ml_sel[[.x, "exclude_last_diag"]],
+          smooth_from = ml_sel[[.x, "smooth_from"]],
+          exclude_high = ml_sel[[.x, "exclude_high"]],
+          exclude_low = ml_sel[[.x, "exclude_low"]],
+          selected_curve = ml_sel[[.x, "selected_curve"]],
+          num_periods = ml_sel[[.x, "num_periods"]],
+          future_dev_periods = ml_sel[[.x, "future_dev_periods"]],
           premium = exp_base,
           bf_prior = ml_sel[[.x, "bf_priors"]] # Add bf_prior argument for bf method
         )
@@ -130,13 +127,13 @@ ml_pattern_range <- function(ml_results, num_fits = 25, metric = ave_score) {
           data = data,
           dev_period_length = ml_results$ml_inputs$dev_period_length,
           dev_period_units = ml_results$ml_inputs$dev_period_units,
-          exclude_last_diag = ml_sel[[.x, 1]],
-          smooth_from = ml_sel[[.x, 2]],
-          exclude_high = ml_sel[[.x, 3]],
-          exclude_low = ml_sel[[.x, 4]],
-          selected_curve = ml_sel[[.x, 5]],
-          num_periods = ml_sel[[.x, 6]],
-          future_dev_periods = ml_sel[[.x, 7]],
+          exclude_last_diag = ml_sel[[.x, "exclude_last_diag"]],
+          smooth_from = ml_sel[[.x, "smooth_from"]],
+          exclude_high = ml_sel[[.x, "exclude_high"]],
+          exclude_low = ml_sel[[.x, "exclude_low"]],
+          selected_curve = ml_sel[[.x, "selected_curve"]],
+          num_periods = ml_sel[[.x, "num_periods"]],
+          future_dev_periods = ml_sel[[.x, "future_dev_periods"]],
           premium = exp_base,
           cc_decay_factor = ml_sel[[.x, "decay_factors"]] # Add decay_factor argument for cc method
         )

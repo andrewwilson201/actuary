@@ -85,8 +85,8 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     if(is.null(premium)) stop("need to supply an premium if BF or CC method is used.")
     cohort_var_string <- rlang::as_name(rlang::enquo(cohort_var))
     if(!(cohort_var_string %in% colnames(premium))) stop("premium needs to contain the same cohort name as in the triangle data provided")
-    data_cohort_values <- data %>% dplyr::pull(!!rlang::enquo(cohort_var)) %>% unique()
-    exposure_base_cohort_values <- premium %>% dplyr::pull(!!rlang::enquo(cohort_var)) %>% unique()
+    data_cohort_values <- data |> dplyr::pull(!!rlang::enquo(cohort_var)) |> unique()
+    exposure_base_cohort_values <- premium |> dplyr::pull(!!rlang::enquo(cohort_var)) |> unique()
 
     missing_cohorts <- setdiff(data_cohort_values, exposure_base_cohort_values)
 
@@ -215,25 +215,25 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
 
   }
 
-  # need the magrittr pipe operator for the in-pipe left join below
-
-  `%>%` <- dplyr::`%>%`
-
-
   # fit chain ladder pattern
+
+  dev_row_counts <- data |>
+    dplyr::group_by({{ dev_var }}) |>
+    dplyr::summarise(num = dplyr::n()) |>
+    dplyr::mutate(dev_temp = {{ dev_var }} - dev_period_length) |>
+    dplyr::rename(num_next = num) |>
+    dplyr::select(-{{ dev_var }})
+
+  max_dev_period <- max(dplyr::pull(data, {{ dev_var }}))
 
   development_pattern <- data |>
     # flag how many rows to include in numerator and denominator at each dev period
     dplyr::group_by({{ dev_var }}) |>
     dplyr::arrange({{ cohort_var }}, .by_group = TRUE) |>
     dplyr::mutate(num = dplyr::n()) |>
-    dplyr::ungroup() %>%
+    dplyr::ungroup() |>
     dplyr::left_join(
-      {.} |>
-        dplyr::distinct({{ dev_var }}, num) |>
-        dplyr::mutate(dev_temp = {{ dev_var }} - dev_period_length) |>
-        dplyr::rename(num_next = num) |>
-        dplyr::select(-{{ dev_var }}),
+      dev_row_counts,
       dplyr::join_by({{ dev_var }} == dev_temp)
     ) |>
     dplyr::group_by({{ dev_var }}) |>
@@ -242,10 +242,18 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     dplyr::mutate(denominator_include = dplyr::if_else(dplyr::row_number() <= num_next - exclude_last_diag, 1, 0),
                   numerator_include = dplyr::if_else(dplyr::row_number() <= num - exclude_last_diag, 1, 0)) |>
     # adjust for cohort start
-    dplyr::mutate(numerator_include = dplyr::if_else({{ cohort_var }} < dplyr::coalesce({{ cohort_start }}, 0),
-                                                     0, numerator_include),
-                  denominator_include = dplyr::if_else({{ cohort_var }} < dplyr::coalesce({{ cohort_start }}, 0),
-                                                       0, denominator_include)) |>
+    dplyr::mutate(
+      numerator_include = if (is.null(cohort_start)) {
+        numerator_include
+      } else {
+        dplyr::if_else({{ cohort_var }} < cohort_start, 0, numerator_include)
+      },
+      denominator_include = if (is.null(cohort_start)) {
+        denominator_include
+      } else {
+        dplyr::if_else({{ cohort_var }} < cohort_start, 0, denominator_include)
+      }
+    ) |>
     # calculate ata ratios and flag high and low in each dev period
     dplyr::group_by({{ cohort_var }}) |>
     dplyr::arrange({{ dev_var }}, .by_group = TRUE) |>
@@ -325,16 +333,13 @@ fit_development_pattern <- function(cohort_var, dev_var, weighting_var, data,
     # if ata is zero then set to 1
     dplyr::mutate(ata = dplyr::if_else(ata == 0, 1, ata)) |>
     # expand for number of future dev periods
-    dplyr::mutate(original_data_flag = 1) %>%
+    dplyr::mutate(original_data_flag = 1) |>
     dplyr::bind_rows(
-      dplyr::tibble(!!rlang::enquo(dev_var) := {
-        max_val <- max(dplyr::pull(., !!rlang::enquo(dev_var)))
-        seq(
-          from = max_val + dev_period_length,
+      dplyr::tibble(!!rlang::enquo(dev_var) := seq(
+          from = max_dev_period + dev_period_length,
           by = dev_period_length,
           length.out = additional_rows
-        )
-      },
+        ),
       ata = 1,
       original_data_flag = 0)
     ) |>

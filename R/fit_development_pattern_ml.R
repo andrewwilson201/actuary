@@ -520,15 +520,12 @@ fit_development_pattern_ml <- function(cohort_var, dev_var, weighting_var, data,
       panel.grid.minor = ggplot2::element_blank()
     )
 
-  # capture the name of the data frame
-  data_name <- deparse(substitute(data))
-
   # return the inputs as well
-  ml_inputs <- dplyr::tibble(
+  ml_inputs <- list(
     cohort_var = as.character(rlang::ensym(cohort_var)),
     dev_var = as.character(rlang::ensym(dev_var)),
     weighting_var = as.character(rlang::ensym(weighting_var)),
-    data_name = data_name,
+    data = data,
     dev_period_length = dev_period_length,
     dev_period_units = dev_period_units
   )

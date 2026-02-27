@@ -70,7 +70,7 @@ create_simulations <- function(num_sims, mean_freq, sev_dist, sev_param1 = 1, se
   # if empirical dataset provided then column names need to be probability and loss
   if({{ sev_dist }} == "empirical" & !(("loss" %in% colnames(empirical)) & ("probability" %in% colnames(empirical)))) stop("empirical dataset needs to have columns titled loss and probability")
 
-  if(var_freq == mean_freq) {
+  if(isTRUE(all.equal(var_freq, mean_freq))) {
 
     # if var not specified then simulate required number of poisson variables
     losses <- dplyr::tibble(num = stats::rpois(num_sims, mean_freq)) |>
